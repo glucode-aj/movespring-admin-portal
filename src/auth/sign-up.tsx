@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowIcon, AuthLayout, BrandMark, EyeIcon } from './authshared';
+import { navigate } from '../router';
 
 interface SignUpScreenProps {
   onNavigateToSignIn?: () => void;
@@ -20,10 +21,11 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // Mock registration: replace with real sign-up, then navigate on success.
     if (onSuccessRegister) {
       onSuccessRegister();
     } else {
-      alert(`Mock Registration Submitted for ${firstName || 'Mandlakazi'} at ${companyName || 'Glucode'}`);
+      navigate('/dashboard');
     }
   };
 
@@ -37,7 +39,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
       <div className="ms-right">
         <div className="ms-narrow">
           <div className="ms-pill">
-            <button type="button" className="ms-pill-btn" onClick={onNavigateToSignIn}>
+            <button type="button" className="ms-pill-btn" onClick={onNavigateToSignIn ?? (() => navigate('/signin'))}>
               Sign in
             </button>
             <button type="button" className="ms-pill-btn ms-active">

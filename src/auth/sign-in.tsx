@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowIcon, AuthLayout, BrandMark, EyeIcon } from './authshared';
+import { navigate } from '../router';
 
 interface SignInScreenProps {
   onNavigateToSignUp?: () => void;
@@ -17,10 +18,11 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // Mock login: replace with real auth, then navigate on success.
     if (onSuccessLogin) {
       onSuccessLogin();
     } else {
-      alert('Mock Login Submitted for: ' + (email || 'admin@glucode.com'));
+      navigate('/dashboard');
     }
   };
 
@@ -37,7 +39,7 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({
             <button type="button" className="ms-pill-btn ms-active">
               Sign in
             </button>
-            <button type="button" className="ms-pill-btn" onClick={onNavigateToSignUp}>
+            <button type="button" className="ms-pill-btn" onClick={onNavigateToSignUp ?? (() => navigate('/signup'))}>
               Create account
             </button>
           </div>
