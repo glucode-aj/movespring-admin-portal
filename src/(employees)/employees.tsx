@@ -1,11 +1,140 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import DashboardScreen from '../(dashboard)/dashboard';
+
+type Tab = 'overview' | 'employees' | 'reports';
+type RoleFilter = 'Admins' | 'Employees' | 'All';
 
 interface EmployeesScreenProps {
-  onNavigateTab?: (tab: 'overview' | 'employees' | 'reports') => void;
+  /** Optional override. By default the header tabs navigate via the shared router. */
+  onNavigateTab?: (tab: Tab) => void;
   onSelectEmployee?: (id: string) => void;
   onAddEmployee?: () => void;
   adminName?: string;
 }
+
+/**
+ * Employees page. It reuses DashboardScreen for the full-viewport layout,
+ * header bar and tab navigation, and only adds the styles below.
+ */
+const CSS = `
+.md-root .md-emp { display: flex; flex-direction: column; gap: 32px; }
+
+.md-root .md-emp-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+
+/* Button reset (host-app safe) */
+.md-root .md-emp-btn {
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+.md-root .md-emp-btn:focus { outline: none; }
+.md-root .md-emp-btn:focus-visible { outline: 2px solid #000000; outline-offset: 2px; }
+
+.md-root .md-emp-add {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 28px;
+  background: #D9D9D9;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.md-root .md-emp-add:hover { background: #cfcfcf; box-shadow: inset 0 0 0 1px #000000; }
+.md-root .md-emp-plus { font-size: 18px; line-height: 1; }
+
+.md-root .md-emp-filter-wrap { position: relative; }
+.md-root .md-emp-filter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 140px;
+  padding: 16px 20px;
+  background: #D9D9D9;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.md-root .md-emp-filter:hover { background: #cfcfcf; box-shadow: inset 0 0 0 1px #000000; }
+.md-root .md-emp-caret { font-size: 12px; }
+
+.md-root .md-emp-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  width: 176px;
+  padding: 4px 0;
+  background: #ffffff;
+  border: 1px solid #000000;
+  box-shadow: 4px 4px 0 0 #000000;
+}
+.md-root .md-emp-item { display: block; width: 100%; padding: 10px 16px; font-size: 12px; line-height: 1.2; }
+.md-root .md-emp-item:hover { background: #f2f2f2; }
+.md-root .md-emp-item.md-selected { background: #D9D9D9; font-weight: 700; }
+
+/* Employee rows (reuse .md-sched-row / .md-sched-inner from the dashboard) */
+.md-root .md-emp-list { display: flex; flex-direction: column; gap: 20px; }
+.md-root .md-emp-row { cursor: pointer; transition: background 0.15s; }
+.md-root .md-emp-row:hover { background: #cfcfcf; }
+.md-root .md-emp-row:focus-visible { outline: 2px solid #000000; outline-offset: 2px; }
+.md-root .md-emp-who { display: flex; align-items: center; gap: 16px; min-width: 0; }
+.md-root .md-emp-avatar { flex: none; width: 40px; height: 40px; background: #000000; border-radius: 9999px; }
+.md-root .md-emp-name { font-size: 14px; font-weight: 700; line-height: 1.3; }
+.md-root .md-emp-meta { font-size: 12px; line-height: 1.3; color: #525252; }
+.md-root .md-emp-stats { display: flex; align-items: center; gap: 24px; font-size: 12px; }
+.md-root .md-emp-steps { color: #404040; }
+.md-root .md-emp-points { font-weight: 700; }
+.md-root .md-emp-arrow { font-size: 14px; font-weight: 700; }
+
+/* Pending invitations */
+.md-root .md-emp-pending { display: flex; flex-direction: column; gap: 16px; padding: 32px; background: #D9D9D9; border-radius: 24px; }
+.md-root .md-emp-pending-title { font-size: 14px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.md-root .md-emp-inv-list { display: flex; flex-direction: column; gap: 12px; }
+.md-root .md-emp-inv {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  min-height: 56px;
+  padding: 8px 24px;
+  border: 2px dashed #4f4f4f;
+  font-size: 13px;
+}
+.md-root .md-emp-inv-left, .md-root .md-emp-inv-right { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; }
+.md-root .md-emp-resend {
+  padding: 5px 12px;
+  background: #ffffff;
+  border: 1px solid #000000;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  transition: background 0.15s, color 0.15s;
+}
+.md-root .md-emp-resend:hover { background: #000000; color: #ffffff; }
+
+@media (max-width: 900px) {
+  .md-root .md-emp-steps { display: none; }
+  .md-root .md-emp-pending { padding: 20px; }
+}
+@media (max-width: 640px) {
+  .md-root .md-emp-meta { display: none; }
+}
+`;
+
+const ROLE_OPTIONS: RoleFilter[] = ['Admins', 'Employees', 'All'];
 
 export const EmployeesScreen: React.FC<EmployeesScreenProps> = ({
   onNavigateTab,
@@ -13,38 +142,34 @@ export const EmployeesScreen: React.FC<EmployeesScreenProps> = ({
   onAddEmployee,
   adminName = 'Mandlakazi',
 }) => {
-  const [roleFilter, setRoleFilter] = useState<'Admins' | 'Employees' | 'All'>('Admins');
+  const [roleFilter, setRoleFilter] = useState<RoleFilter>('Admins');
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
 
-  // Built-in Mock Data matching the design screenshots
+  // Close the dropdown on outside click or Escape
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setDropdownOpen(false);
+    };
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [dropdownOpen]);
+
+  // Built-in mock data
   const employees = [
-    {
-      id: 'usr_01',
-      firstName: 'Jack',
-      lastName: 'Sparrow',
-      email: 'jack@caribbean.com',
-      team: 'Caribbean',
-      points: '34,500 pts',
-      steps: '89,400 steps',
-    },
-    {
-      id: 'usr_02',
-      firstName: 'Elizabeth',
-      lastName: 'Swann',
-      email: 'elizabeth@gov.com',
-      team: 'Royal Navy',
-      points: '29,200 pts',
-      steps: '76,500 steps',
-    },
-    {
-      id: 'usr_03',
-      firstName: 'Will',
-      lastName: 'Turner',
-      email: 'will@blacksmith.com',
-      team: 'Flying Dutchman',
-      points: '31,000 pts',
-      steps: '81,200 steps',
-    },
+    { id: 'usr_01', firstName: 'Jack', lastName: 'Sparrow', email: 'jack@caribbean.com', team: 'Caribbean', points: '34,500 pts', steps: '89,400 steps' },
+    { id: 'usr_02', firstName: 'Elizabeth', lastName: 'Swann', email: 'elizabeth@gov.com', team: 'Royal Navy', points: '29,200 pts', steps: '76,500 steps' },
+    { id: 'usr_03', firstName: 'Will', lastName: 'Turner', email: 'will@blacksmith.com', team: 'Flying Dutchman', points: '31,000 pts', steps: '81,200 steps' },
   ];
 
   const pendingInvitations = [
@@ -54,166 +179,106 @@ export const EmployeesScreen: React.FC<EmployeesScreenProps> = ({
   ];
 
   return (
-    <div className="min-h-screen w-full bg-white font-mono p-4 sm:p-6 md:p-8 flex flex-col gap-8 antialiased select-none text-black">
-      {/* 1. Global Header Navigation Pill Bar */}
-      <header className="w-full bg-[#D9D9D9] rounded-full p-2.5 sm:p-3 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white flex items-center justify-center border border-black shadow-sm">
-            <svg className="w-6 h-6 text-black" viewBox="0 0 100 100" fill="currentColor">
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M50 15C30.67 15 15 30.67 15 50C15 69.33 30.67 85 50 85C56.63 85 62.84 83.16 68.12 79.98L58.5 65.5C55.93 67.09 52.93 68 50 68C40.06 68 32 59.94 32 50C32 40.06 40.06 32 50 32C59.94 32 68 40.06 68 50H85C85 30.67 69.33 15 50 15Z"
-              />
-            </svg>
-          </div>
+    <DashboardScreen activeTab="employees" onNavigateTab={onNavigateTab} adminName={adminName}>
+      <div className="md-emp">
+        <style>{CSS}</style>
 
-          <nav className="inline-flex items-center rounded-full border border-black bg-[#D9D9D9] p-1">
-            <button
-              type="button"
-              onClick={() => onNavigateTab && onNavigateTab('overview')}
-              className="rounded-full px-4 sm:px-6 py-1.5 text-xs sm:text-sm font-medium text-black hover:opacity-75 transition-opacity"
-            >
-              Overview
-            </button>
-            <button
-              type="button"
-              onClick={() => onNavigateTab && onNavigateTab('employees')}
-              className="rounded-full bg-white border border-black px-4 sm:px-6 py-1.5 text-xs sm:text-sm font-bold text-black shadow-sm"
-            >
-              Employees
-            </button>
-            <button
-              type="button"
-              onClick={() => onNavigateTab && onNavigateTab('reports')}
-              className="rounded-full px-4 sm:px-6 py-1.5 text-xs sm:text-sm font-medium text-black hover:opacity-75 transition-opacity"
-            >
-              Reports
-            </button>
-          </nav>
-        </div>
-
-        <div className="flex items-center gap-3 bg-white border border-black rounded-full px-4 py-1.5 shadow-sm">
-          <div className="w-6 h-6 rounded-full bg-black flex items-center justify-center text-white text-[10px] font-bold">
-            {adminName.charAt(0)}
-          </div>
-          <span className="text-xs sm:text-sm font-bold text-black hidden sm:inline">
-            {adminName}
-          </span>
-        </div>
-      </header>
-
-      {/* 2. Action & Filter Bar */}
-      <div className="flex items-center justify-between w-full">
-        {/* Left Action Button */}
-        <button
-          type="button"
-          onClick={onAddEmployee}
-          className="bg-[#D9D9D9] hover:bg-neutral-300 text-black px-6 py-2.5 rounded-sm font-bold text-xs sm:text-sm flex items-center gap-2 border border-transparent hover:border-black transition-all cursor-pointer"
-        >
-          <span className="text-base font-bold">+</span>
-          <span>Add Employee</span>
-        </button>
-
-        {/* Right Role Filter Dropdown */}
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center justify-between gap-3 bg-[#D9D9D9] hover:bg-neutral-300 rounded-xl px-5 py-2.5 text-xs sm:text-sm font-bold text-black border border-transparent hover:border-black transition-all cursor-pointer"
-          >
-            <span>{roleFilter}</span>
-            <span className="text-xs">▾</span>
+        {/* Action & filter bar */}
+        <div className="md-emp-bar">
+          <button type="button" className="md-emp-btn md-emp-add" onClick={onAddEmployee}>
+            <span className="md-emp-plus">+</span>
+            <span>Add Employee</span>
           </button>
 
-          {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-44 bg-white border border-black shadow-[4px_4px_0px_0px_#000000] z-20 py-1">
-              {(['Admins', 'Employees', 'All'] as const).map((role) => (
-                <button
-                  key={role}
-                  type="button"
-                  onClick={() => {
-                    setRoleFilter(role);
-                    setDropdownOpen(false);
-                  }}
-                  className={`w-full text-left px-4 py-2 text-xs font-mono transition-colors ${
-                    roleFilter === role ? 'font-bold bg-[#D9D9D9]' : 'hover:bg-neutral-100'
-                  }`}
-                >
-                  {role}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+          <div className="md-emp-filter-wrap" ref={filterRef}>
+            <button
+              type="button"
+              className="md-emp-btn md-emp-filter"
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              aria-haspopup="listbox"
+              aria-expanded={dropdownOpen}
+            >
+              <span>{roleFilter}</span>
+              <span className="md-emp-caret">▾</span>
+            </button>
 
-      {/* Main Content: Active Employee Cards */}
-      <main className="flex flex-col gap-8">
-        {/* Active Employee Rows */}
-        <div className="flex flex-col gap-4">
+            {dropdownOpen && (
+              <div className="md-emp-menu" role="listbox">
+                {ROLE_OPTIONS.map((role) => (
+                  <button
+                    key={role}
+                    type="button"
+                    role="option"
+                    aria-selected={roleFilter === role}
+                    className={`md-emp-btn md-emp-item${roleFilter === role ? ' md-selected' : ''}`}
+                    onClick={() => {
+                      setRoleFilter(role);
+                      setDropdownOpen(false);
+                    }}
+                  >
+                    {role}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Employee rows */}
+        <div className="md-emp-list">
           {employees.map((emp) => (
             <div
               key={emp.id}
-              onClick={() => onSelectEmployee && onSelectEmployee(emp.id)}
-              className="w-full bg-[#D9D9D9] p-2 rounded-sm cursor-pointer hover:bg-neutral-300 transition-colors"
+              className="md-sched-row md-emp-row"
               role="button"
               tabIndex={0}
+              onClick={() => onSelectEmployee?.(emp.id)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onSelectEmployee?.(emp.id);
+                }
+              }}
             >
-              <div className="w-full h-16 border border-dashed border-black flex items-center justify-between px-4 sm:px-6">
-                {/* Left: Solid Black Circular Avatar & Identity */}
-                <div className="flex items-center gap-4">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black flex-shrink-0" />
-                  <div className="flex flex-col">
-                    <span className="font-bold text-sm text-black">
+              <div className="md-sched-inner">
+                <div className="md-emp-who">
+                  <span className="md-emp-avatar" aria-hidden="true" />
+                  <div>
+                    <div className="md-emp-name">
                       {emp.firstName} {emp.lastName}
-                    </span>
-                    <span className="text-xs text-neutral-600 hidden sm:inline">
+                    </div>
+                    <div className="md-emp-meta">
                       {emp.email} • Team: {emp.team}
-                    </span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Right: Metrics / Link Arrow */}
-                <div className="flex items-center gap-4 sm:gap-6 text-xs font-mono">
-                  <span className="hidden md:inline text-neutral-700">
-                    {emp.steps}
-                  </span>
-                  <span className="font-bold text-black">
-                    {emp.points}
-                  </span>
-                  <span className="text-black font-bold text-sm">→</span>
+                <div className="md-emp-stats">
+                  <span className="md-emp-steps">{emp.steps}</span>
+                  <span className="md-emp-points">{emp.points}</span>
+                  <span className="md-emp-arrow">→</span>
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Pending Invitations Section */}
-        <section className="w-full bg-[#D9D9D9] rounded-2xl p-6 sm:p-8 flex flex-col gap-4">
-          <div className="text-sm font-bold text-black uppercase tracking-wider">
-            Pending Invitations
-          </div>
-
-          <div className="flex flex-col gap-3">
+        {/* Pending invitations */}
+        <section className="md-emp-pending">
+          <div className="md-emp-pending-title">Pending Invitations</div>
+          <div className="md-emp-inv-list">
             {pendingInvitations.map((inv) => (
-              <div
-                key={inv.id}
-                className="w-full h-14 border border-dashed border-black flex items-center justify-between px-4 sm:px-6 text-xs sm:text-sm bg-[#D9D9D9]"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="font-bold text-black">{inv.email}</span>
-                  <span className="text-neutral-600 text-xs hidden md:inline">[{inv.role}]</span>
+              <div key={inv.id} className="md-emp-inv">
+                <div className="md-emp-inv-left">
+                  <span className="md-sched-name">{inv.email}</span>
+                  <span className="md-muted">[{inv.role}]</span>
                 </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-neutral-600 text-xs">Sent {inv.sent}</span>
+                <div className="md-emp-inv-right">
+                  <span className="md-muted">Sent {inv.sent}</span>
                   <button
                     type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      alert(`Resent invitation to ${inv.email}`);
-                    }}
-                    className="px-3 py-1 bg-white border border-black text-xs font-bold hover:bg-black hover:text-white transition-colors cursor-pointer"
+                    className="md-emp-btn md-emp-resend"
+                    onClick={() => alert(`Resent invitation to ${inv.email}`)}
                   >
                     Resend
                   </button>
@@ -222,8 +287,8 @@ export const EmployeesScreen: React.FC<EmployeesScreenProps> = ({
             ))}
           </div>
         </section>
-      </main>
-    </div>
+      </div>
+    </DashboardScreen>
   );
 };
 

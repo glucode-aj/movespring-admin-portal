@@ -1,8 +1,15 @@
 import { useEffect, useState } from 'react';
 
 /**
- * Minimal hash-based router (no dependencies).
- * URLs look like  yoursite.com/#/signin, #/signup, #/dashboard, #/employees, #/reports
+ * Minimal router (no dependencies).
+ *
+ * The current route lives in memory and is mirrored to the URL hash
+ * (#/signin, #/signup, #/dashboard, #/employees, #/reports) so refresh,
+ * back/forward and direct links work.
+ *
+ * Navigation never depends on the URL actually changing: if the browser refuses
+ * the update (sandboxed preview, another router owning the URL, ...) the screen
+ * still switches.
  */
 export type Route = '/signin' | '/signup' | '/dashboard' | '/employees' | '/reports';
 
@@ -14,12 +21,36 @@ export const readRoute = (): Route => {
   return (ROUTES as string[]).includes(path) ? (path as Route) : DEFAULT_ROUTE;
 };
 
+let current: Route | null = null;
+const listeners = new Set<() => void>();
+
+const getRoute = (): Route => {
+  if (current === null) current = readRoute();
+  return current;
+};
+
+const setCurrent = (next: Route): void => {
+  if (current === next) return;
+  current = next;
+  listeners.forEach((notify) => notify());
+};
+
+/** Keep the in-memory route in sync when the URL changes (back/forward, typed URL, links). */
+const syncFromUrl = (): void => setCurrent(readRoute());
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('hashchange', syncFromUrl);
+  window.addEventListener('popstate', syncFromUrl);
+}
+
 export const navigate = (to: Route): void => {
-  if (window.location.hash === `#${to}`) {
-    // Same URL: no hashchange fires, so notify listeners manually.
-    window.dispatchEvent(new HashChangeEvent('hashchange'));
-  } else {
-    window.location.hash = to;
+  setCurrent(to);
+  try {
+    if (window.location.hash !== `#${to}`) {
+      window.history.pushState(null, '', `#${to}`);
+    }
+  } catch {
+    // The URL can't be written in this context; the in-memory route above already switched the screen.
   }
 };
 
@@ -35,12 +66,15 @@ const TAB_TO_ROUTE: Record<Tab, Route> = {
 export const navigateTab = (tab: Tab): void => navigate(TAB_TO_ROUTE[tab]);
 
 export const useRoute = (): Route => {
-  const [route, setRoute] = useState<Route>(readRoute);
+  const [route, setRoute] = useState<Route>(getRoute);
 
   useEffect(() => {
-    const onHashChange = () => setRoute(readRoute());
-    window.addEventListener('hashchange', onHashChange);
-    return () => window.removeEventListener('hashchange', onHashChange);
+    const update = () => setRoute(getRoute());
+    listeners.add(update);
+    update(); // catch a navigation that happened between render and this effect
+    return () => {
+      listeners.delete(update);
+    };
   }, []);
 
   return route;
