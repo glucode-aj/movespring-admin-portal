@@ -1,20 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import AppRouter from './Approuter';
 
-import SignIn from './auth/sign-in.tsx';
-import SignUp from './auth/sign-up.tsx';
-import Dashboard from './(dashboard)/dashboard.tsx';
-
-function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to="/sign-in" replace />} />
-        <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/sign-up" element={<SignUp />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
-    </BrowserRouter>
-  );
+export default function App() {
+  return <AppRouter />;
 }
-
-export default App;
