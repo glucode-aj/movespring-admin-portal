@@ -10,11 +10,7 @@ interface DashboardScreenProps {
   companyName?: string;
 }
 
-/**
- * Self-contained styles: no Tailwind or global CSS required.
- * Every rule is scoped under .md-root and the root is fixed to the viewport,
- * so centered / max-width parents (#root, body flex, etc.) can't squash it.
- */
+
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap');
 
@@ -249,7 +245,7 @@ const CSS = `
 }
 `;
 
-/** Approximation of the brand mark. Swap for the exported Figma SVG for pixel accuracy. */
+
 const Mark: React.FC = () => (
   <svg viewBox="0 0 99 151" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <path d="M97.1 19.6A55 55 0 1 0 73.8 106.7L63.9 79.4A26 26 0 1 1 74.9 38.3Z" />
@@ -264,7 +260,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
   adminName = 'Mandlakazi',
   companyName = 'Glucode',
 }) => {
-  // Built-in mock data matching the design
+  
   const activeChallenge = {
     name: 'Challenge A',
     weeksRemaining: 3,
