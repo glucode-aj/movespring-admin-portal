@@ -273,9 +273,9 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
     weeksRemaining: 3,
     progressPercentage: 80,
     topTeams: [
-      { id: '1', name: 'Team Alpha', points: '12,400 pts/member' },
-      { id: '2', name: 'Team Beta', points: '11,150 pts/member' },
-      { id: '3', name: 'Team Gamma', points: '9,800 pts/member' },
+      { id: '1', name: 'Team Alpha', points: '12,400 pts' },
+      { id: '2', name: 'Team Beta', points: '11,150 pts' },
+      { id: '3', name: 'Team Gamma', points: '9,800 pts' },
     ],
   };
 

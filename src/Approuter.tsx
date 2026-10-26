@@ -2,17 +2,8 @@ import React from 'react';
 import SignInScreen from './auth/sign-in';
 import SignUpScreen from './auth/sign-up';
 import DashboardScreen from './(dashboard)/dashboard';
-import { navigate, useRoute, Route } from './router';
-
-type Tab = 'overview' | 'employees' | 'reports';
-
-const TAB_TO_ROUTE: Record<Tab, Route> = {
-  overview: '/dashboard',
-  employees: '/employees',
-  reports: '/reports',
-};
-
-const navigateTab = (tab: Tab) => navigate(TAB_TO_ROUTE[tab]);
+import EmployeesScreen from './(employees)/employees';
+import { useRoute } from './router';
 
 const ComingSoon: React.FC<{ title: string }> = ({ title }) => (
   <section className="md-card md-card-id">
@@ -20,7 +11,7 @@ const ComingSoon: React.FC<{ title: string }> = ({ title }) => (
   </section>
 );
 
-/** Renders whichever screen matches the current URL hash. */
+/** Renders whichever screen matches the current URL hash. Each screen handles its own navigation. */
 export const AppRouter: React.FC = () => {
   const route = useRoute();
 
@@ -28,16 +19,12 @@ export const AppRouter: React.FC = () => {
     case '/signup':
       return <SignUpScreen key={route} />;
     case '/dashboard':
-      return <DashboardScreen key={route} activeTab="overview" onNavigateTab={navigateTab} />;
+      return <DashboardScreen key={route} activeTab="overview" />;
     case '/employees':
-      return (
-        <DashboardScreen key={route} activeTab="employees" onNavigateTab={navigateTab}>
-          <ComingSoon title="Employees" />
-        </DashboardScreen>
-      );
+      return <EmployeesScreen key={route} />;
     case '/reports':
       return (
-        <DashboardScreen key={route} activeTab="reports" onNavigateTab={navigateTab}>
+        <DashboardScreen key={route} activeTab="reports">
           <ComingSoon title="Reports" />
         </DashboardScreen>
       );

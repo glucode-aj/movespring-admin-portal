@@ -23,6 +23,17 @@ export const navigate = (to: Route): void => {
   }
 };
 
+export type Tab = 'overview' | 'employees' | 'reports';
+
+const TAB_TO_ROUTE: Record<Tab, Route> = {
+  overview: '/dashboard',
+  employees: '/employees',
+  reports: '/reports',
+};
+
+/** Navigate to the page behind a dashboard header tab. */
+export const navigateTab = (tab: Tab): void => navigate(TAB_TO_ROUTE[tab]);
+
 export const useRoute = (): Route => {
   const [route, setRoute] = useState<Route>(readRoute);
 
