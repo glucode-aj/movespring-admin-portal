@@ -1,10 +1,32 @@
 import React, { useEffect, useRef, useState } from 'react';
 import DashboardScreen from '../(dashboard)/dashboard';
+import EmployeeEmptyStateScreen from '../(employees)/employeeemptystate';
+import { navigate } from '../router';
 
 type Tab = 'overview' | 'employees' | 'reports';
 type RoleFilter = 'Admins' | 'Employees' | 'All';
 
+interface Employee {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  team: string;
+  points: string;
+  steps: string;
+}
+
+interface Invitation {
+  id: string;
+  email: string;
+  role: string;
+  sent: string;
+}
+
 interface EmployeesScreenProps {
+  /** Pass your real data. An empty `employees` and `pendingInvitations` shows the empty state. Omit both to use the sample data. */
+  employees?: Employee[];
+  pendingInvitations?: Invitation[];
   /** Optional override. By default the header tabs navigate via the shared router. */
   onNavigateTab?: (tab: Tab) => void;
   onSelectEmployee?: (id: string) => void;
@@ -137,6 +159,8 @@ const CSS = `
 const ROLE_OPTIONS: RoleFilter[] = ['Admins', 'Employees', 'All'];
 
 export const EmployeesScreen: React.FC<EmployeesScreenProps> = ({
+  employees: employeesProp,
+  pendingInvitations: invitationsProp,
   onNavigateTab,
   onSelectEmployee,
   onAddEmployee,
@@ -166,17 +190,31 @@ export const EmployeesScreen: React.FC<EmployeesScreenProps> = ({
   }, [dropdownOpen]);
 
   // Built-in mock data
-  const employees = [
+  const employees: Employee[] = employeesProp ?? [
     { id: 'usr_01', firstName: 'Jack', lastName: 'Sparrow', email: 'jack@caribbean.com', team: 'Caribbean', points: '34,500 pts', steps: '89,400 steps' },
     { id: 'usr_02', firstName: 'Elizabeth', lastName: 'Swann', email: 'elizabeth@gov.com', team: 'Royal Navy', points: '29,200 pts', steps: '76,500 steps' },
     { id: 'usr_03', firstName: 'Will', lastName: 'Turner', email: 'will@blacksmith.com', team: 'Flying Dutchman', points: '31,000 pts', steps: '81,200 steps' },
   ];
 
-  const pendingInvitations = [
+  const pendingInvitations: Invitation[] = invitationsProp ?? [
     { id: 'inv_1', email: 'sarah.connor@glucode.com', role: 'Employee', sent: '2 days ago' },
     { id: 'inv_2', email: 'john.doe@glucode.com', role: 'Employee', sent: '4 days ago' },
     { id: 'inv_3', email: 'alex.vance@glucode.com', role: 'Employee', sent: '1 week ago' },
   ];
+
+  // Open the details page by default; pass onSelectEmployee to override (e.g. to route by id).
+  const handleSelect = (id: string) => (onSelectEmployee ? onSelectEmployee(id) : navigate('/employee-details'));
+
+  // Nothing to show yet: render the empty state (same header and tabs)
+  if (employees.length === 0 && pendingInvitations.length === 0) {
+    return (
+      <EmployeeEmptyStateScreen
+        onNavigateTab={onNavigateTab}
+        onInviteFirstEmployee={onAddEmployee}
+        adminName={adminName}
+      />
+    );
+  }
 
   return (
     <DashboardScreen activeTab="employees" onNavigateTab={onNavigateTab} adminName={adminName}>
@@ -232,11 +270,11 @@ export const EmployeesScreen: React.FC<EmployeesScreenProps> = ({
               className="md-sched-row md-emp-row"
               role="button"
               tabIndex={0}
-              onClick={() => onSelectEmployee?.(emp.id)}
+              onClick={() => handleSelect(emp.id)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  onSelectEmployee?.(emp.id);
+                  handleSelect(emp.id);
                 }
               }}
             >
