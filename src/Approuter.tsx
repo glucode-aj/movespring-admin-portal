@@ -3,6 +3,7 @@ import SignInScreen from './auth/sign-in';
 import SignUpScreen from './auth/sign-up';
 import DashboardScreen from './(dashboard)/dashboard';
 import { navigate, useRoute, Route } from './router';
+import { ReportScreen } from './(reports)/reports';
 
 type Tab = 'overview' | 'employees' | 'reports';
 
@@ -38,7 +39,7 @@ export const AppRouter: React.FC = () => {
     case '/reports':
       return (
         <DashboardScreen key={route} activeTab="reports" onNavigateTab={navigateTab}>
-          <ComingSoon title="Reports" />
+          <ReportScreen />
         </DashboardScreen>
       );
     case '/signin':
