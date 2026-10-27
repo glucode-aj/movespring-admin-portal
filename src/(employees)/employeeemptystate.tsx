@@ -1,5 +1,6 @@
 import React from 'react';
 import DashboardScreen from '../(dashboard)/dashboard';
+import { navigate } from '../router';
 
 type Tab = 'overview' | 'employees' | 'reports';
 
@@ -135,7 +136,7 @@ export const EmployeeEmptyStateScreen: React.FC<EmployeeEmptyStateScreenProps> =
 
         <div className="md-empty-note">No employees added to this company yet</div>
 
-        <button type="button" className="md-empty-cta" onClick={onInviteFirstEmployee}>
+        <button type="button" className="md-empty-cta" onClick={onInviteFirstEmployee ?? (() => navigate('/add-employee'))}>
           <span>Invite First Employee</span>
           <ArrowIcon />
         </button>

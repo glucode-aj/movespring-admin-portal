@@ -205,12 +205,15 @@ export const EmployeesScreen: React.FC<EmployeesScreenProps> = ({
   // Open the details page by default; pass onSelectEmployee to override (e.g. to route by id).
   const handleSelect = (id: string) => (onSelectEmployee ? onSelectEmployee(id) : navigate('/employee-details'));
 
+  // Open the add-employee form by default; pass onAddEmployee to override.
+  const handleAdd = () => (onAddEmployee ? onAddEmployee() : navigate('/add-employee'));
+
   // Nothing to show yet: render the empty state (same header and tabs)
   if (employees.length === 0 && pendingInvitations.length === 0) {
     return (
       <EmployeeEmptyStateScreen
         onNavigateTab={onNavigateTab}
-        onInviteFirstEmployee={onAddEmployee}
+        onInviteFirstEmployee={handleAdd}
         adminName={adminName}
       />
     );
@@ -223,7 +226,7 @@ export const EmployeesScreen: React.FC<EmployeesScreenProps> = ({
 
         {/* Action & filter bar */}
         <div className="md-emp-bar">
-          <button type="button" className="md-emp-btn md-emp-add" onClick={() => navigate('/add-employee')}>
+          <button type="button" className="md-emp-btn md-emp-add" onClick={handleAdd}>
             <span className="md-emp-plus">+</span>
             <span>Add Employee</span>
           </button>

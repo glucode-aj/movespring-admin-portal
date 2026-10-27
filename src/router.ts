@@ -11,9 +11,9 @@ import { useEffect, useState } from 'react';
  * the update (sandboxed preview, another router owning the URL, ...) the screen
  * still switches.
  */
-export type Route = '/signin' | '/signup' | '/dashboard' | '/employees' | '/employees-empty' | '/employee-details' | '/reports' | '/add-employee';
+export type Route = '/signin' | '/signup' | '/dashboard' | '/employees' | '/employees-empty' | '/employee-details' | '/add-employee' | '/reports';
 
-export const ROUTES: Route[] = ['/signin', '/signup', '/dashboard', '/employees', '/employees-empty', '/employee-details', '/reports', '/add-employee'];
+export const ROUTES: Route[] = ['/signin', '/signup', '/dashboard', '/employees', '/employees-empty', '/employee-details', '/add-employee', '/reports'];
 export const DEFAULT_ROUTE: Route = '/signin';
 
 export const readRoute = (): Route => {
@@ -39,13 +39,6 @@ const setCurrent = (next: Route): void => {
 const syncFromUrl = (): void => setCurrent(readRoute());
 
 if (typeof window !== 'undefined') {
-  // Start the application on the sign-in screen.
-  if (window.location.hash !== '#/signin') {
-    window.history.replaceState(null, '', '#/signin');
-  }
-
-  current = '/signin';
-
   window.addEventListener('hashchange', syncFromUrl);
   window.addEventListener('popstate', syncFromUrl);
 }
@@ -74,8 +67,6 @@ export const navigateTab = (tab: Tab): void => navigate(TAB_TO_ROUTE[tab]);
 
 export const useRoute = (): Route => {
   const [route, setRoute] = useState<Route>(getRoute);
-
-  console.log('Current route:', route);
 
   useEffect(() => {
     const update = () => setRoute(getRoute());

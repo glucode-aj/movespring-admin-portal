@@ -17,7 +17,7 @@ const ComingSoon: React.FC<{ title: string }> = ({ title }) => (
 /** Renders whichever screen matches the current URL hash. Each screen handles its own navigation. */
 export const AppRouter: React.FC = () => {
   const route = useRoute();
-console.log('AppRouter rendering route:', route);
+
   switch (route) {
     case '/signup':
       return <SignUpScreen key={route} />;
@@ -25,12 +25,12 @@ console.log('AppRouter rendering route:', route);
       return <DashboardScreen key={route} activeTab="overview" />;
     case '/employees':
       return <EmployeesScreen key={route} />;
+    case '/add-employee':
+      return <AddEmployeeForm key={route} />;
     case '/employee-details':
       return <EmployeeDetailsScreen key={route} />;
     case '/employees-empty':
       return <EmployeeEmptyStateScreen key={route} />;
-    case '/add-employee':
-      return <AddEmployeeForm key={route} />;
     case '/reports':
       return (
         <DashboardScreen key={route} activeTab="reports">
