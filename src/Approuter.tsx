@@ -2,8 +2,8 @@ import React from 'react';
 import SignInScreen from './auth/sign-in';
 import SignUpScreen from './auth/sign-up';
 import DashboardScreen from './(dashboard)/dashboard';
+import ReportScreen from './(reports)/reports';
 import { navigate, useRoute, Route } from './router';
-import { ReportScreen } from './(reports)/reports';
 
 type Tab = 'overview' | 'employees' | 'reports';
 
