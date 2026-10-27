@@ -223,7 +223,7 @@ export const EmployeesScreen: React.FC<EmployeesScreenProps> = ({
 
         {/* Action & filter bar */}
         <div className="md-emp-bar">
-          <button type="button" className="md-emp-btn md-emp-add" onClick={onAddEmployee}>
+          <button type="button" className="md-emp-btn md-emp-add" onClick={() => navigate('/add-employee')}>
             <span className="md-emp-plus">+</span>
             <span>Add Employee</span>
           </button>

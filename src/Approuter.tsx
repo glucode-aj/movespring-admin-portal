@@ -5,6 +5,7 @@ import DashboardScreen from './(dashboard)/dashboard';
 import EmployeesScreen from './(employees)/employees';
 import EmployeeEmptyStateScreen from './(employees)/employeeemptystate';
 import EmployeeDetailsScreen from './(employees)/employeedetailsscreen';
+import AddEmployeeForm from './(employees)/addemployeescreen';
 import { useRoute } from './router';
 
 const ComingSoon: React.FC<{ title: string }> = ({ title }) => (
@@ -16,7 +17,7 @@ const ComingSoon: React.FC<{ title: string }> = ({ title }) => (
 /** Renders whichever screen matches the current URL hash. Each screen handles its own navigation. */
 export const AppRouter: React.FC = () => {
   const route = useRoute();
-
+console.log('AppRouter rendering route:', route);
   switch (route) {
     case '/signup':
       return <SignUpScreen key={route} />;
@@ -28,6 +29,8 @@ export const AppRouter: React.FC = () => {
       return <EmployeeDetailsScreen key={route} />;
     case '/employees-empty':
       return <EmployeeEmptyStateScreen key={route} />;
+    case '/add-employee':
+      return <AddEmployeeForm key={route} />;
     case '/reports':
       return (
         <DashboardScreen key={route} activeTab="reports">
