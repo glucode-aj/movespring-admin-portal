@@ -2,8 +2,14 @@ import React from 'react';
 import SignInScreen from './auth/sign-in';
 import SignUpScreen from './auth/sign-up';
 import DashboardScreen from './(dashboard)/dashboard';
+import EmployeesScreen from './(employees)/employees';
+import EmployeeEmptyStateScreen from './(employees)/employeeemptystate';
+import EmployeeDetailsScreen from './(employees)/employeedetailsscreen';
+import AddEmployeeForm from './(employees)/addemployeescreen';
+import ActivityReviewForm from './(employees)/(activity)/activityreviewscreen';
+import { useRoute } from './router';
 import ReportScreen from './(reports)/reports';
-import { navigate, useRoute, Route } from './router';
+import { navigate, Route } from './router';
 
 type Tab = 'overview' | 'employees' | 'reports';
 
@@ -20,8 +26,7 @@ const ComingSoon: React.FC<{ title: string }> = ({ title }) => (
     <h2 className="md-company">{title} page coming soon</h2>
   </section>
 );
-
-/** Renders whichever screen matches the current URL hash. */
+/** Renders whichever screen matches the current URL hash. Each screen handles its own navigation. */
 export const AppRouter: React.FC = () => {
   const route = useRoute();
 
@@ -29,13 +34,17 @@ export const AppRouter: React.FC = () => {
     case '/signup':
       return <SignUpScreen key={route} />;
     case '/dashboard':
-      return <DashboardScreen key={route} activeTab="overview" onNavigateTab={navigateTab} />;
+      return <DashboardScreen key={route} activeTab="overview" />;
     case '/employees':
-      return (
-        <DashboardScreen key={route} activeTab="employees" onNavigateTab={navigateTab}>
-          <ComingSoon title="Employees" />
-        </DashboardScreen>
-      );
+      return <EmployeesScreen key={route} />;
+    case '/add-employee':
+      return <AddEmployeeForm key={route} />;
+    case '/activity-review':
+      return <ActivityReviewForm key={route} />;
+    case '/employee-details':
+      return <EmployeeDetailsScreen key={route} />;
+    case '/employees-empty':
+      return <EmployeeEmptyStateScreen key={route} />;
     case '/reports':
       return (
         <DashboardScreen key={route} activeTab="reports" onNavigateTab={navigateTab}>

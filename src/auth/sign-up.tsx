@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowIcon, AuthLayout, BrandMark, EyeIcon } from './authshared';
+import { ArrowIcon, AuthLayout, BrandMark, EyeIcon } from './AuthShared';
 import { navigate } from '../router';
 
 interface SignUpScreenProps {
