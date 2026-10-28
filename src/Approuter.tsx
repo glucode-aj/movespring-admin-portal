@@ -6,6 +6,7 @@ import EmployeesScreen from './(employees)/employees';
 import EmployeeEmptyStateScreen from './(employees)/employeeemptystate';
 import EmployeeDetailsScreen from './(employees)/employeedetailsscreen';
 import AddEmployeeForm from './(employees)/addemployeescreen';
+import ActivityReviewForm from './(employees)/(activity)/activityreviewscreen';
 import { useRoute } from './router';
 
 const ComingSoon: React.FC<{ title: string }> = ({ title }) => (
@@ -13,7 +14,6 @@ const ComingSoon: React.FC<{ title: string }> = ({ title }) => (
     <h2 className="md-company">{title} page coming soon</h2>
   </section>
 );
-
 /** Renders whichever screen matches the current URL hash. Each screen handles its own navigation. */
 export const AppRouter: React.FC = () => {
   const route = useRoute();
@@ -27,6 +27,8 @@ export const AppRouter: React.FC = () => {
       return <EmployeesScreen key={route} />;
     case '/add-employee':
       return <AddEmployeeForm key={route} />;
+    case '/activity-review':
+      return <ActivityReviewForm key={route} />;
     case '/employee-details':
       return <EmployeeDetailsScreen key={route} />;
     case '/employees-empty':

@@ -11,9 +11,9 @@ import { useEffect, useState } from 'react';
  * the update (sandboxed preview, another router owning the URL, ...) the screen
  * still switches.
  */
-export type Route = '/signin' | '/signup' | '/dashboard' | '/employees' | '/employees-empty' | '/employee-details' | '/add-employee' | '/reports';
+export type Route = '/signin' | '/signup' | '/dashboard' | '/employees' | '/employees-empty' | '/employee-details' | '/add-employee' | '/activity-review' | '/reports';
 
-export const ROUTES: Route[] = ['/signin', '/signup', '/dashboard', '/employees', '/employees-empty', '/employee-details', '/add-employee', '/reports'];
+export const ROUTES: Route[] = ['/signin', '/signup', '/dashboard', '/employees', '/employees-empty', '/employee-details', '/add-employee', '/activity-review', '/reports'];
 export const DEFAULT_ROUTE: Route = '/signin';
 
 export const readRoute = (): Route => {

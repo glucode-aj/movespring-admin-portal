@@ -246,7 +246,7 @@ export const EmployeeDetailsScreen: React.FC<EmployeeDetailsScreenProps> = ({
                     key={item.id}
                     type="button"
                     className="md-det-btn md-det-flag-row"
-                    onClick={() => onReviewActivity?.(item.id)}
+                    onClick={() => (onReviewActivity ? onReviewActivity(item.id) : navigate('/activity-review'))}
                   >
                     <span>
                       <span className="md-det-flag-title">{item.title}</span>
