@@ -1,4 +1,5 @@
 import React from 'react';
+import { navigateTab } from '../router';
 
 type Tab = 'overview' | 'employees' | 'reports';
 
@@ -294,8 +295,8 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
   const handleTab = (tab: Tab) => {
     if (tab === 'reports' && onOpenReports) {
       onOpenReports();
-    } else if (onNavigateTab) {
-      onNavigateTab(tab);
+    } else {
+      (onNavigateTab ?? navigateTab)(tab);
     }
   };
 
