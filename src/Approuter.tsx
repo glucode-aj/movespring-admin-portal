@@ -8,6 +8,18 @@ import EmployeeDetailsScreen from './(employees)/employeedetailsscreen';
 import AddEmployeeForm from './(employees)/addemployeescreen';
 import ActivityReviewForm from './(employees)/(activity)/activityreviewscreen';
 import { useRoute } from './router';
+import ReportScreen from './(reports)/reports';
+import { navigate, Route } from './router';
+
+type Tab = 'overview' | 'employees' | 'reports';
+
+const TAB_TO_ROUTE: Record<Tab, Route> = {
+  overview: '/dashboard',
+  employees: '/employees',
+  reports: '/reports',
+};
+
+const navigateTab = (tab: Tab) => navigate(TAB_TO_ROUTE[tab]);
 
 const ComingSoon: React.FC<{ title: string }> = ({ title }) => (
   <section className="md-card md-card-id">
@@ -35,8 +47,8 @@ export const AppRouter: React.FC = () => {
       return <EmployeeEmptyStateScreen key={route} />;
     case '/reports':
       return (
-        <DashboardScreen key={route} activeTab="reports">
-          <ComingSoon title="Reports" />
+        <DashboardScreen key={route} activeTab="reports" onNavigateTab={navigateTab}>
+          <ReportScreen />
         </DashboardScreen>
       );
     case '/signin':
