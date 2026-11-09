@@ -5,6 +5,7 @@ import DashboardScreen from './(dashboard)/dashboard';
 import EmployeesScreen from './(employees)/employees';
 import EmployeeEmptyStateScreen from './(employees)/employeeemptystate';
 import EmployeeDetailsScreen from './(employees)/employeedetailsscreen';
+import TeamActivityScreen from './(employees)/teamactivityscreen';
 import AddEmployeeForm from './(employees)/addemployeescreen';
 import ReportScreen from './(reports)/reports';
 import ActivityReviewForm from './(employees)/(activity)/activityreviewscreen';
@@ -30,6 +31,8 @@ export const AppRouter: React.FC = () => {
       return <ActivityReviewForm key={route} />;
     case '/employee-details':
       return <EmployeeDetailsScreen key={route} />;
+    case '/team-activity':
+      return <TeamActivityScreen key={route} />;
     case '/employees-empty':
       return <EmployeeEmptyStateScreen key={route} />;
     case '/reports':
