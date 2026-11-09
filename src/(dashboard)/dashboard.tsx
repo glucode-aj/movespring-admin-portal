@@ -1,11 +1,13 @@
 import React from 'react';
-import { navigateTab } from '../router';
+import { navigate, navigateTab } from '../router';
 
 type Tab = 'overview' | 'employees' | 'reports';
 
 interface DashboardScreenProps {
   onNavigateTab?: (tab: Tab) => void;
   onOpenReports?: () => void;
+  /** Optional override. By default the "New Challenge" button opens the add-challenge form. */
+  onAddChallenge?: () => void;
   activeTab?: Tab;
   adminName?: string;
   companyName?: string;
@@ -223,6 +225,30 @@ const CSS = `
   color: #000000;
   text-align: left;
 }
+.md-root .md-sched-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+.md-root .md-sched-head .md-sched-title { flex: 0 1 476px; width: auto; }
+.md-root .md-sched-add {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 16px 28px;
+  border: 0;
+  border-radius: 6px;
+  background: #D9D9D9;
+  color: #000000;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.md-root .md-sched-add:hover { background: #cfcfcf; box-shadow: inset 0 0 0 1px #000000; }
+.md-root .md-sched-add:focus { outline: none; }
+.md-root .md-sched-add:focus-visible { outline: 2px solid #000000; outline-offset: 2px; }
+.md-root .md-sched-add-plus { font-size: 18px; line-height: 1; }
 .md-root .md-sched-list { display: flex; flex-direction: column; gap: 20px; }
 .md-root .md-sched-row { padding: 16px 15px; background: #D9D9D9; }
 .md-root .md-sched-inner {
@@ -263,6 +289,7 @@ const Mark: React.FC = () => (
 export const DashboardScreen: React.FC<DashboardScreenProps> = ({
   onNavigateTab,
   onOpenReports,
+  onAddChallenge,
   activeTab = 'overview',
   adminName = 'Mandlakazi',
   companyName = 'Glucode',
@@ -379,7 +406,17 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
 
           {/* Scheduled challenges */}
           <section className="md-sched">
-            <h2 className="md-sched-title">Scheduled Challenges</h2>
+            <div className="md-sched-head">
+              <h2 className="md-sched-title">Scheduled Challenges</h2>
+              <button
+                type="button"
+                className="md-sched-add"
+                onClick={onAddChallenge ?? (() => navigate('/add-challenge'))}
+              >
+                <span className="md-sched-add-plus" aria-hidden="true">+</span>
+                <span>New Challenge</span>
+              </button>
+            </div>
             <div className="md-sched-list">
               {scheduledChallenges.map((c) => (
                 <div key={c.id} className="md-sched-row">

@@ -218,7 +218,7 @@ export const EmployeeDetailsScreen: React.FC<EmployeeDetailsScreenProps> = ({
                 <button
                   type="button"
                   className="md-det-btn md-det-tile md-det-team"
-                  onClick={() => onOpenTeam?.(employee.team)}
+                  onClick={() => (onOpenTeam ? onOpenTeam(employee.team) : navigate('/team-activity'))}
                 >
                   <span className="md-det-tile-main">
                     <span className="md-det-dot" aria-hidden="true" />
