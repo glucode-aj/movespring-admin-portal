@@ -1,0 +1,66 @@
+:where(.md-root, .ms-root) .ui-button { appearance: none; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; color: inherit; font-family: inherit; text-align: inherit; }
+/* Shared surfaces are deliberately padding-free to preserve existing layouts. */
+:is(.md-root, .ms-root) { background: var(--background); }
+:is(.md-root, .ms-root) .ui-card {
+  border: 2px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface-gradient);
+  box-shadow: var(--shadow-card);
+}
+:is(.md-root, .ms-root) .ui-card--elevated, .ui-card--elevated { box-shadow: var(--shadow-raised); }
+:is(.md-root, .ms-root) .ui-card--interactive { transition: background 160ms, box-shadow 160ms; }
+:is(.md-root, .ms-root) .ui-card--interactive:hover { background: var(--surface-hover); box-shadow: var(--shadow-raised); }
+:is(.md-root, .ms-root) .ui-button { cursor: pointer; }
+:is(.md-root, .ms-root) .ui-button:disabled { cursor: wait; opacity: .65; }
+:is(.md-root, .ms-root) .ui-button--primary { display: flex; align-items: center; justify-content: space-between; border-radius: var(--radius-control); background: var(--primary); color: var(--on-primary); font-weight: 700; box-shadow: var(--shadow-raised); transition: background 150ms, transform 100ms, box-shadow 100ms;
+}
+:is(.md-root, .ms-root) .ui-button--primary:hover { background: var(--primary-hover); }
+:is(.md-root, .ms-root) .ui-button--primary:active { background: var(--primary-pressed); box-shadow: var(--shadow-inset); transform: translateY(1px); }
+:is(.md-root, .ms-root) .ui-input {
+  border: 2px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-inset);
+}
+:is(.md-root, .ms-root) .ui-input:focus { border-color: var(--primary); }
+:is(.md-root, .ms-root) :is(.ui-button, .ui-input, .ui-choice):focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+:is(.md-root, .ms-root) :is(.ms-field, .md-add-field, .md-chal-field, .md-act-field) { border-radius: var(--radius-card); }
+.md-root .md-header { border-radius: var(--radius-card); background: var(--surface-gradient); box-shadow: var(--shadow-raised); }
+.md-root :is(.md-nav, .md-admin) { border-radius: var(--radius-card); border-color: var(--border); background: var(--surface-muted); }
+.md-root .md-tab { border-radius: var(--radius-control); transition: background 160ms, color 160ms; }
+.md-root .md-tab.md-active, .ms-root .ms-pill-btn.ms-active { background: var(--primary); color: var(--on-primary); box-shadow: var(--shadow-raised); }
+.md-root .md-tab:not(.md-active):hover { background: var(--surface-hover); color: var(--primary); opacity: 1; }
+.ui-theme-toggle { position: fixed; bottom: 18px; left: 18px; z-index: 30; }
+.ui-theme-toggle select { font: inherit; font-size: 12px; padding: 8px 12px; color: var(--text-primary); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-control); box-shadow: var(--shadow-raised); }
+.ui-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.ui-modal { max-width: min(90vw, 520px); padding: 0; border: 0; border-radius: var(--radius-card); background: var(--surface); color: var(--text-primary); font: inherit; margin: auto; }
+.ui-modal::backdrop { background: var(--scrim); backdrop-filter: blur(4px); }
+.ui-modal-content { padding: 28px; text-align: center; }
+.ui-animation { width: 150px; height: 130px; margin: auto; display: grid; place-items: center; }
+.ui-spinner { width: 40px; height: 40px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+.ui-success-icon { color: var(--success); width: 64px; height: 64px; }
+.ui-animation-error { color: var(--danger); }
+.ui-falcon-scene { width: min(400px, 75vw); height: 180px; position: relative; }
+.ui-house { position: absolute; bottom: 0; width: 42%; overflow-wrap: anywhere; font-size: 12px; }
+.ui-house svg { display: block; width: 42px; height: 42px; margin: 0 auto 8px; color: var(--primary); }
+.ui-house--sender { left: 0; }.ui-house--recipient { right: 0; }
+.ui-falcon { width: 48px; height: 48px; position: absolute; left: 15%; top: 65px; color: var(--primary); animation: falcon-flight 2.4s ease-in-out forwards; }
+.ui-falcon-scroll { color: var(--warning); }
+.ui-animation-actions { margin-top: 18px; padding: 10px 18px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--primary); color: var(--on-primary); font: inherit; cursor: pointer; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes falcon-flight { 0% { left: 15%; top: 65px; transform: rotate(-12deg); } 50% { top: 0; transform: rotate(0); } 100% { left: 74%; top: 65px; transform: rotate(12deg); } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } .ui-falcon { left: 45%; top: 25px; } }
+
+.ui-lottie-player { width: 100%; height: 100%; }
+.ms-root .ms-terms { font-size: 11px; }
+.md-root .md-team-roster-curtag { color: var(--on-primary); }
+.md-root .md-rep-line { stroke: var(--primary); }
+
+/* Low-specificity reset above must yield to each existing layout class. */
+:where(.md-root, .ms-root) .ui-input { appearance: none; display: block; width: 100%; padding: 0 16px; font: inherit; font-size: 14px; transition: border-color 150ms; }
+
+
+:where(.md-root) .ui-button { font: inherit; }
+
+:is(.md-root, .ms-root) .ui-card-border--thin { border-width: 1px; }
